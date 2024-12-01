@@ -12,7 +12,7 @@
 ✔️LLM語言模型：根據網路圖產生行銷文案與分析報告，生成創意點子的好幫手！<br>
 
 報告用簡報：https://drive.google.com/file/d/1Kzmr5Srn-AAGnDKQa3O0rdRUc0jNAeZT/view?usp=sharing <br> 
-報告用展示影片(2分鐘速講版)： <br>
+報告用展示影片(2分鐘速講版)：https://drive.google.com/file/d/1EgzAX_EsRj9WLHUtM0SeyiSKIJf3vU3T/view?usp=sharing <br>
 
 ---
 
