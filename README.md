@@ -72,20 +72,39 @@
     <table>
    <tr>
    <td>
-      <img src="README_IMG/Step1.png" alt="PChome" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <img src="README_IMG/Step1.png" alt="Step1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
       <div style="text-align: center;">Step1.選擇地區</div>
    </td>
    <td>
-      <img src="README_IMG/Step2.png" alt="DeeperInsight1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <img src="README_IMG/Step2.png" alt="Step2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
       <div style="text-align: center;">Step2.選擇時間與通路</div>
    </td>
    <td>
-      <img src="README_IMG/Step3.png" alt="DeeperInsight1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <img src="README_IMG/Step3.png" alt="Step3" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
       <div style="text-align: center;">Step3.選擇產品類別</div>
    </td>
    </tr>
    </table>
    <br>
+
+   <table>
+   <tr>
+   <td>
+      <img src="README_IMG/regular2" alt="regular2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">一般網路圖</div>
+   </td>
+   <td>
+      <img src="README_IMG/articulation2.png" alt="articulation2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">關鍵節點網路圖</div>
+   </td>
+   <td>
+      <img src="README_IMG/community2.png" alt="community2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">社群分析網路圖</div>
+   </td>
+   </tr>
+   </table>
+   <br>
+   
 ---
 
 #### 3. 產品併買關係分析 - 以客群分類來看：<br>
