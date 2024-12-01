@@ -104,6 +104,22 @@
    </tr>
    </table>
    <br>
+
+   <table>
+   <tr>
+   <td>
+      <img src="README_IMG/slogan2.png" alt="slogan2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">AI 文案示例</div>
+   </td>
+   <td>
+      <img src="README_IMG/report2.png" alt="report2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">AI 報告（部分）</div>
+   </td>
+   </tr>
+   </table>
+   <br>
+
+   
    
 ---
 
@@ -127,7 +143,7 @@
 ---
 
 #### 6. 上傳自有發票分析<br>
-   使用也可以自行上傳發票到系統，其發票品名會自動經過BERT處理，將產品歸類，以利後續的分析。<br>
+   使用者也可以自行上傳發票到系統，其發票品名會自動經過BERT處理，將產品歸類，以利後續的分析。<br>
    <table>
    <tr>
    <td>
