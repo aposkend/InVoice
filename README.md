@@ -69,7 +69,23 @@
 
 #### 2. 產品併買關係分析 - 以產品分類來看：<br>
    使用者可以設定地區、時間、通路等條件，查看某產品分類底下的產品併買關係，同時系統會自動與ChatGPT串連，生成專業的商業分析報告以及銷售文案，供使用者在產品策略和銷售決策上的參考。<br>
-
+    <table>
+   <tr>
+   <td>
+      <img src="README_IMG/PChome1.png" alt="PChome" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Step1.選擇地區</div>
+   </td>
+   <td>
+      <img src="README_IMG/DeeperInsight1.png" alt="DeeperInsight1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Step2.選擇時間與通路</div>
+   </td>
+   <td>
+      <img src="README_IMG/DeeperInsight1.png" alt="DeeperInsight1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Step3.選擇產品類別</div>
+   </td>
+   </tr>
+   </table>
+   <br>
 ---
 
 #### 3. 產品併買關係分析 - 以客群分類來看：<br>
@@ -97,7 +113,7 @@
    <tr>
    <td>
       <img src="README_IMG/Upload.png" alt="TP Luggage" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
-      <div style="text-align: center;">Upload Invoices<br>(最佳:Momo,Costco)</div>
+      <div style="text-align: center;">Upload Invoices</div>
    </td>
    </tr>
    </table>
