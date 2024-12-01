@@ -37,11 +37,11 @@
    <tr>
    <td>
       <img src="README_IMG/TP_luggage.png" alt="TP Luggage" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
-      <div style="text-align: center;">Total Profit of Luggage in different Channels(最佳:Momo,Costco)</div>
+      <div style="text-align: center;">Total Profit of Luggage in different Channels<br>(最佳:Momo,Costco)</div>
    </td>
    <td>
       <img src="README_IMG/PSS_luggage.png" alt="PSS Luggage" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
-      <div style="text-align: center;">Profit per Sales of Luggage in different Channels(最佳:三井,遠百)</div>
+      <div style="text-align: center;">Profit per Sales of Luggage in different Channels<br>(最佳:三井,遠百)</div>
    </td>
    </tr>
    </table>
