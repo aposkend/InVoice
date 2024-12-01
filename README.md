@@ -50,8 +50,12 @@
    <table>
    <tr>
    <td>
-      <img src="README_IMG/Costco1.png" alt="Costco" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
-      <div style="text-align: center;">點擊Costco後可查看該通路之產品併買關係</div>
+      <img src="README_IMG/PChome1.png" alt="PChome" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">點擊PcHome後可查看該通路之產品併買關係</div>
+   </td>
+      <td>
+      <img src="README_IMG/DeeperInsight1.png" alt="DeeperInsight1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">點擊DeeperInsight查看某分類之產品細項</div>
    </td>
    </tr>
    </table>
