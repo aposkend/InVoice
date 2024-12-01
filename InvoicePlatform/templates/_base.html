@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-teal-100 h-screen flex items-center justify-center">
+    <div class="bg-white shadow-xl rounded-lg flex max-w-5xl w-full mx-auto overflow-hidden">
+        
+        
+        <!-- Left Section  -->
+        <div class="hidden md:flex w-1/2 bg-teal-100 justify-center items-center p-8 relative">
+            
+        </div>
+
+
+        {% block content %}
+        <div class="w-full md:w-1/2 py-16 px-12">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Sign Up</h1>
+            <p class="text-gray-500 mb-8">Analyze your invoices, generate insights, and empower your business with ease.</p>
+
+            
+            
+            
+        </div>
+        {% endblock %}
+    </div>
+</body>
+{% block script %}
+<script>
+    function displayErrors() {
+        var errorMessages = [];
+        {% for field, error_list in form.errors.items %}
+        {% for error in error_list %}
+            errorMessages.push('{{ field|capfirst }}: {{ error }}');
+        {% endfor %}
+        {% endfor %}
+        
+        if (errorMessages.length > 0) {
+            alert("Error(s) found:\n" + errorMessages.join('\n'));
+            return false;  // Prevent form submission
+        }
+        return true;  // Allow form submission
+    }
+</script>
+{% endblock %}
+
+</html>

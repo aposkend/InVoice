@@ -1,0 +1,46 @@
+{% extends "Base.html" %}
+{% block title %}Log In Page {% endblock %}
+{% block content %}
+<div class="w-full md:w-1/2 py-16 px-12">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Invoice Platform</h1>
+    <p class="text-gray-500 mb-8">Analyze your invoices, generate insights, and empower your business with ease.</p>
+    
+ 
+      
+      <form method="post" action="{% url 'users:login' %}">
+        {% csrf_token %}
+        {% load widget_tweaks %}
+
+       
+        <div class="mb-4">
+            {{ form.username|add_class:"w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400" }}
+        </div>
+
+       
+        <div class="mb-4">
+            {{ form.password|add_class:"w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400" }}
+        </div>
+        <div class="text-red-500 flex-grow">
+          {% for message in messages %}
+              {{ message }}
+          {% endfor %}
+        </div>
+        
+        <div>
+            <button class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg">
+                Log In
+            </button>
+        </div>
+    </form>
+
+    
+    <div class="mt-4 text-center">
+        <p class="text-sm text-gray-600">Don't have an account? <a class="text-teal-500 hover:underline"  href="{% url 'users:signup' %}">SignUp</a></p>
+    </div>
+
+    
+    
+    
+</div>
+{% endblock %}
+
