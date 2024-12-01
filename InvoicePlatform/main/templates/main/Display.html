@@ -1,0 +1,751 @@
+{% extends "Mainpage.html" %}
+{% load static %}
+{% block main %}
+<div class="h-screen pt-10">
+    <div class="container mx-auto py-4 h-full flex flex-col space-y-6 px-4">
+
+        <!-- Main Grid Layout with adjusted spacing for sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow border-t-0">
+            <!-- Left Section (Picture and Buttons) -->
+            <div class="lg:col-span-2 p-5 rounded-lg shadow-lg bg-white relative h-full flex flex-col">
+                <div class="flex items-center space-x-4">
+                    <!-- Title with dynamic content -->
+                    <span>{{ countyName }} {{ districtName }} {{ smallTag }} {% if path %} in {{ path }}{% endif %}</span>
+        
+    
+            
+
+                    <!-- Buttons beside the title -->
+                    <button id="showRegular" class="px-3 py-1 bg-green-500 text-white text-sm font-medium rounded-md hover:bg-green-600 transition duration-200">
+                        Regular
+                    </button>
+                    <button id="showArticulation" class="px-3 py-1 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 transition duration-200">
+                        Articulation 
+                    </button>
+                    <button id="showCommunity" class="px-3 py-1 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 transition duration-200">
+                        Community
+                    </button>
+                </div>
+                
+                <!-- Main content area with iframe -->
+                <div class="flex justify-center mb-4 flex-grow overflow-auto">
+                    <iframe id="picture" class="w-full h-full border-none rounded-md"></iframe>
+                </div>
+                {% if productList %}
+                <!-- 靠左顯示的按鈕 -->
+                <div class="relative mt-4 ml-4">
+                    <button id="viewTitleListButton" onclick="toggleTitleList()" class="px-4 py-2 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none shadow-md">
+                        Selected Products
+                    </button>
+                </div>
+                
+                <!-- Title List (隱藏並在按鈕下方顯示) -->
+                <div id="titleListContainer" class="hidden mt-2 ml-4 max-w-md p-4 bg-white rounded-lg shadow-md border border-gray-200">
+                    {% for n in productList %}
+                        <p class="text-sm text-gray-700">{{ forloop.counter }}. {{ n }}</p>
+                    {% endfor %}
+                </div>
+                 {% endif %}
+                <!-- Analyze and Save Buttons -->
+                <div class="absolute bottom-4 right-4 flex space-x-3">
+                    <button id="analyzeButton" class="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-600 transition duration-200">
+                        Analyze
+                    </button>
+                    <button id="saveDataBtn" class="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-600 transition duration-200 flex items-center">
+                        <ion-icon name="save-outline" class="mr-1"></ion-icon>Save
+                    </button>
+                </div>
+                <div id="messageBox" class="hidden px-3 py-2 rounded-md mt-4 max-w-xs mx-auto text-center text-sm"></div>
+
+            </div>
+            
+            <!-- Right Section (Revise Form and Deeper Insight) -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <form method="POST" class="flex flex-col space-y-4">
+                    {% csrf_token %}
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Revise</h4>
+
+                    <div>
+                        <label for="limit" class="block text-lg font-medium text-gray-700">Limit (1-300){% if limit %} ({{ limit }}){% endif %}</label>
+                        <input type="number" id="limit" name="limit" min="1" max="300" class="mt-2 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-lg" placeholder="輸入限制數字">
+                    </div>
+                
+                    <!-- District Selection Menu with Filter -->
+                    <div>
+                        <label for="district" class="block text-lg font-medium text-gray-700">{{ countyName }}行政區</label>
+                        <select id="district" name="district" class="mt-2 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value=""></option>
+                            {% for district in districtList %}
+                                <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    
+                    <div>
+                        <label for="path" class="block text-lg font-medium text-gray-700">通路</label>
+                        <select id="store" name="store" class="mt-2 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" selected></option>
+                            {% for store in stores %}
+                                <option value="{{ store }}">{{ store }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    
+                    <div>
+                        <label for="startTime" class="block text-lg font-medium text-gray-700">開始時間{% if startTime %} ({{ startTime }}){% endif %}</label>
+                        <input type="text" id="startTime" name="startTime"  class="datetimepicker mt-2 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    
+                    <div>
+                        <label for="endTime" class="block text-lg font-medium text-gray-700">結束時間{% if endTime %} ({{ endTime }}){% endif %}</label>
+                        <input type="text" id="endTime" name="endTime"  class="datetimepicker mt-2 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <!-- 新增的 checkbox 選項 -->
+                    <div class="flex items-center">
+                        <input id="excludeDiscounts" name="excludeDiscounts" type="checkbox" class="h-6 w-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="excludeDiscounts" class="ml-3 block text-lg font-medium text-gray-700">去除包含優惠的資料</label>
+                    </div>
+
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-md shadow-sm hover:bg-blue-600 transition duration-200">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+
+                <form method="GET" action="{% url 'main:getDeeperInsight' %}" class="flex flex-col space-y-4">
+                    <div class="relative">
+                        <label for="deeperInsightSearch" class="block text-lg font-medium text-gray-700">Deeper Insight</label>
+                        <input type="text" id="deeperInsightSearch" placeholder="請選擇選項" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" onfocus="toggleDropdown(true)" oninput="filterOptions()">
+                        <input type="hidden" name="deeperInsightSearch" id="hiddenDeeperInsightSearch">
+
+                        <!-- 下拉選單，初始狀態隱藏 -->
+                        <div id="deeperInsightDropdown" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden max-h-60 overflow-y-auto">
+                            <ul id="deeperInsightOptions">
+                                {% for option in options %}
+                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer" onclick="selectOption('{{ option }}')">{{ option }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <button type="submit" class="px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center text-sm w-24 ml-auto">
+                        Go
+                    </button>
+                </form>
+            </div>
+            </div>
+            
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult1" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult2" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult3" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult4" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+
+            <!-- Analysis Result Section - Spanning Both Columns -->
+            <div id="analysisResult5" class="lg:col-span-3 p-4 bg-white rounded-lg shadow-lg border border-blue-200 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800">Analysis Result:</h3>
+                <p>Loading analysis...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        const buttons = document.querySelectorAll("#showRegular, #showArticulation, #showCommunity");
+        function handleActiveButton(event) {
+            buttons.forEach(button => {
+                button.classList.remove("bg-green-500", "text-white");
+                button.classList.add("bg-gray-300", "text-gray-700");
+            });
+            event.currentTarget.classList.add("bg-green-500", "text-white");
+        }
+        buttons.forEach(button => button.addEventListener("click", handleActiveButton));
+        $('#saveDataBtn').click(function(e) {
+            e.preventDefault(); // 防止預設的跳轉行為
+            $.ajax({
+                url: "{% url 'main:saveData' %}",
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    var messageBox = document.getElementById("messageBox");
+                    messageBox.classList.remove("hidden");
+                    messageBox.classList.add("bg-green-100", "text-green-700", "border", "border-green-300");
+                    messageBox.innerHTML = `<p>${response.message}</p>`;
+
+                    setTimeout(function() {
+                        messageBox.classList.add("hidden");
+                        messageBox.innerHTML = ""; 
+                    }, 5000);
+                },
+                error: function(xhr) {
+                    
+                    var messageBox = document.getElementById("messageBox");
+                    messageBox.classList.remove("hidden");
+                    messageBox.classList.add("bg-red-100", "text-red-700", "border", "border-red-300");
+                    messageBox.innerHTML = `<p>${xhr.responseJSON.message}</p>`;
+
+                    setTimeout(function() {
+                        messageBox.classList.add("hidden");
+                        messageBox.innerHTML = "";
+                    }, 5000);
+                }
+
+            });
+        });
+    });
+    
+
+    var analysisResult = ""; 
+    var analysisResult1 = "";
+    var analysisResult2 = "";
+    var analysisResult3 = "";
+    var analysisResult4 = "";
+    var analysisResult5 = "";
+    var analysisType = "regular"; 
+    var analysisInProgress = true;
+    var analysisInProgress1 = true;
+    var analysisInProgress2 = true;
+    var analysisInProgress3 = true;
+    var analysisInProgress4 = true;
+    var analysisInProgress5 = true;
+    $(document).ready(function() {
+        var nodes = "{{ nodes|escapejs }}";
+        var edges = "{{ edges|escapejs }}";
+        var analysisResult = ""; 
+        var analysisInProgress = true; 
+
+        function convertMarkdownToHTML(markdownText) {
+        const htmlText = markdownText
+            // 將標題轉換為不同級別的標題
+            .replace(/^##### (.*$)/gim, '<li class="list-disc list-inside">$1</li>')   // 轉換五級標題為無序列表
+            .replace(/^#### (.*$)/gim, '<h class="text-lg font-semibold text-blue-800 mb-2">$1</h5>') // 四級標題，帶有底部空間
+            .replace(/^### (.*$)/gim, '')   // 三級標題，帶有更大的底部空間
+            .replace(/^## (.*$)/gim, '')    // 二級標題，
+            .replace(/^# (.*$)/gim, '<h3 class="text-3xl font-extrabold text-blue-900 mb-6">$1</h3>')     // 一級標題，帶有更多的空間
+            
+            // 粗體和斜體處理
+            .replace(/\*\*(.*)\*\*/gim, '<strong class="font-bold">$1</strong>') // 粗體字
+            .replace(/\*(.*)\*/gim, '<em class="italic">$1</em>')     // 斜體字
+            
+            // 列點和段落處理
+            .replace(/- (.*$)/gim, '<li class="list-disc list-inside">$1</li>')  // 無序列表項
+            .replace(/\n\n/gim, '<br><br>')  // 將雙換行轉換為段落間距
+            .replace(/\n/gim, '<br>');       // 單換行轉換為換行符
+        return `<div class="prose max-w-none">${htmlText.trim()}</div>`;
+        
+    }
+
+
+
+        function analyze() {
+
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Top Co-Purchased Products";
+                    }else if(analysisType == "articulation"){
+                        question = "Articulation Point Identification";
+                    }else if(analysisType == "community"){
+                        question = " Community Identification";
+                    }
+
+            $.ajax({
+                url: "{% url 'main:analyze' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    analysisInProgress = true;
+                    $('#analysisResult').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p>
+                    <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>
+             `); 
+                },
+                success: function(response) {
+                    if (response.analysis) {
+                        analysisResult = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult);
+                        $('#analysisResult').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult').removeClass('hidden'); 
+                    } else {
+                        $('#analysisResult').removeClass('hidden');
+                        $('#analysisResult').html("<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>No result available.</p>");
+                    }
+                    analysisInProgress = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult').removeClass('hidden');
+                    $('#analysisResult').html("<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Error during analysis.</p>");
+                    analysisInProgress = false;
+                }
+            });
+        }
+
+        function analyze1() {
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Least Co-Purchased Products";
+                    }else if(analysisType == "articulation"){
+                        question = "Articulation Point Importance";
+                    }else if(analysisType == "community"){
+                        question = "Cross Communities Relationships";
+                    }
+            $.ajax({
+                url: "{% url 'main:analyzeq1' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    analysisInProgress1 = true;
+                    
+                    $('#analysisResult1').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p> <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>`); 
+                },
+                success: function(response) {
+                    if (response.analysis) {
+                        analysisResult1 = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult1);
+                        $('#analysisResult1').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult1').removeClass('hidden'); 
+                    } else {
+                        $('#analysisResult1').removeClass('hidden');
+                        $('#analysisResult1').html("<p>No result available.</p>");
+                    }
+                    analysisInProgress1 = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult1').removeClass('hidden');
+                    $('#analysisResult1').html("<p>Error during analysis.</p>");
+                    analysisInProgress1 = false;
+                }
+            });
+        }
+
+        function analyze2() {
+
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Best-Selling Combinations";
+                    }else if(analysisType == "articulation"){
+                        question = "";
+                    }else if(analysisType == "community"){
+                        question = "Important Products in each Communities";
+                    }
+
+            $.ajax({
+                url: "{% url 'main:analyzeq2' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    if(question == ""){
+                        document.getElementById("analysisResult2").style.display = "none";
+                        return;
+                    }else{
+                        document.getElementById("analysisResult2").style.display = "block";
+                    }
+                    analysisInProgress2 = true;
+                    $('#analysisResult2').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p> <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>`); 
+                },
+                success: function(response) {
+                    
+                    if (response.analysis) {
+                        analysisResult2 = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult2);
+                        $('#analysisResult2').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult2').removeClass('hidden'); 
+                    } else {
+                        $('#analysisResult2').removeClass('hidden');
+                        $('#analysisResult2').html("<p>No result available.</p>");
+                    }
+                    analysisInProgress2 = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult2').removeClass('hidden');
+                    $('#analysisResult2').html("<p>Error during analysis.</p>");
+                    analysisInProgress2 = false;
+                }
+            });
+        }
+
+        function analyze3() {
+
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Underperforming Combinations with Potential";
+                    }else if(analysisType == "articulation"){
+                        question = "";
+                    }else if(analysisType == "community"){
+                        question = "Cross-Community Product  recommendation";
+                    }
+
+            $.ajax({
+                url: "{% url 'main:analyzeq3' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    if(question == ""){
+                        document.getElementById("analysisResult3").style.display = "none";
+                        return;
+                    }else{
+                        document.getElementById("analysisResult3").style.display = "block";
+                    }
+                    analysisInProgress3 = true;
+                    $('#analysisResult3').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p> <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>`); 
+                },
+                success: function(response) {
+                    if (response.analysis) {
+                        analysisResult3 = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult3);
+                        $('#analysisResult3').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult3').removeClass('hidden'); 
+                    } else {
+                        $('#analysisResult3').removeClass('hidden');
+                        $('#analysisResult3').html("<p>No result available.</p>");
+                    }
+                    analysisInProgress3 = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult3').removeClass('hidden');
+                    $('#analysisResult3').html("<p>Error during analysis.</p>");
+                    analysisInProgress3 = false;
+                }
+            });
+        }
+
+        function analyze4() {
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Recommendation of combination with multiple products";
+                    }else if(analysisType == "articulation"){
+                        question = "";
+                    }else if(analysisType == "community"){
+                        question = "Within-Community Product combination recommendation";
+                    }
+            $.ajax({
+                url: "{% url 'main:analyzeq4' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    if(question == ""){
+                        document.getElementById("analysisResult4").style.display = "none";
+                        return;
+                    }else{
+                        document.getElementById("analysisResult4").style.display = "block";
+                    }
+                    analysisInProgress4 = true;
+                    $('#analysisResult4').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p> <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>`); 
+                },
+                success: function(response) {
+                    
+                    if (response.analysis) {
+                        analysisResult4 = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult4);
+                        $('#analysisResult4').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult4').removeClass('hidden'); 
+                    } else {
+                        $('#analysisResult4').removeClass('hidden');
+                        $('#analysisResult4').html("<p>No result available.</p>");
+                    }
+                    analysisInProgress4 = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult4').removeClass('hidden');
+                    $('#analysisResult4').html("<p>Error during analysis.</p>");
+                    analysisInProgress4 = false;
+                }
+            });
+        }
+
+        function analyze5() {
+            var question = "";
+                    if(analysisType == "regular"){
+                        question = "Slogans";
+                    }else if(analysisType == "articulation"){
+                        question = "";
+                    }else if(analysisType == "community"){
+                        question = "";
+                    }
+            $.ajax({
+                url: "{% url 'main:analyzeq5' %}",
+                method: "POST",
+                data: {
+                    'analysisType': analysisType, 
+                    'nodes': String(nodes),
+                    'edges': String(edges),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                beforeSend: function() {
+                    if(question == ""){
+                        document.getElementById("analysisResult5").style.display = "none";
+                        return;
+                    }else{
+                        document.getElementById("analysisResult5").style.display = "block";
+                    }
+                    analysisInProgress5 = true;
+                    $('#analysisResult5').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n<p>Loading...</p> <video width="64" height="64" preload="none" style="background: transparent  url('https://cdn-icons-png.flaticon.com/512/17905/17905741.png') 50% 50% / fit no-repeat;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+              <source src="https://cdn-icons-mp4.flaticon.com/512/17905/17905741.mp4" type="video/mp4">
+          </video>`); 
+                },
+                success: function(response) {
+                    
+                    if (response.analysis) {
+                        analysisResult5 = response.analysis;
+                        
+                        var formattedResult = convertMarkdownToHTML(analysisResult5);
+                        $('#analysisResult5').html(`<h3 class='text-lg font-semibold text-blue-800'>${question}</h3>\n${formattedResult}`);
+                        $('#analysisResult5').removeClass('hidden'); 
+                        
+                    } else {
+                        $('#analysisResult5').removeClass('hidden');
+                        $('#analysisResult5').html("<p>No result available.</p>");
+                    }
+
+                    analysisInProgress5 = false; 
+                    
+                },
+                error: function(xhr, status, error) {
+                    $('#analysisResult5').removeClass('hidden');
+                    $('#analysisResult5').html("<p>Error during analysis.</p>");
+                    analysisInProgress5 = false;
+                }
+            });
+        }
+
+        analyze();
+        analyze1();
+        analyze2();
+        analyze3();
+        analyze4();
+        analyze5();
+        $('#showRegular').click(function() {
+            updateIframeContent(relationship);
+            analysisType = 'regular'; 
+            analyze();
+            analyze1();
+            analyze2();
+            analyze3();
+            analyze4();
+            analyze5();
+        });
+
+        $('#showArticulation').click(function() {
+            updateIframeContent(articulation);
+            analysisType = 'articulation'; 
+            analyze();
+            analyze1();
+            analyze2();
+            analyze3();
+            analyze4(); 
+            analyze5();
+        });
+
+        $('#showCommunity').click(function() {
+            updateIframeContent(communities);
+            analysisType = 'community'; 
+            analyze();
+            analyze1();
+            analyze2();
+            analyze3();
+            analyze4();
+            analyze5();
+        });
+        // 當用戶點擊 "Analyze" 按鈕時顯示格式化的分析結果
+        $('#analyzeButton').click(function() {
+            document.getElementById("analysisResult").style.display = "none";
+            document.getElementById("analysisResult1").style.display = "none";
+            document.getElementById("analysisResult2").style.display = "none";
+            document.getElementById("analysisResult3").style.display = "none";
+            document.getElementById("analysisResult4").style.display = "none";
+            document.getElementById("analysisResult5").style.display = "none";
+            analyze();
+            analyze1();
+            analyze2();
+            analyze3();
+            analyze4();
+            analyze5();
+        });
+
+        // 頁面加載時顯示初始圖像
+        var relationship = `{% filter escapejs %}{{ relationship|safe }}{% endfilter %}`;
+        var articulation = `{% filter escapejs %}{{ articulationPoint|safe }}{% endfilter %}`;
+        var communities = `{% filter escapejs %}{{ communities|safe }}{% endfilter %}`;
+
+        function updateIframeContent(content) {
+            const frame = document.getElementById('picture');
+            frame.contentDocument.open();
+            frame.contentDocument.write(content);
+            frame.contentDocument.close();
+        }
+
+        // 頁面加載時顯示 "Regular" 圖像
+        updateIframeContent(relationship);
+
+        
+        
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        var startPicker = flatpickr("#startTime", {
+            locale: "zh-tw",
+            plugins: [new monthSelectPlugin({
+                shorthand: true,
+                dateFormat: "Y-m",
+                altFormat: "F Y",
+            })],
+            minDate: "2020-01", // 設定最小日期
+            maxDate: "2021-12", // 設定最大日期
+            onValueUpdate: function(selectedDates, dateStr, instance) {
+                endPicker.set('minDate', dateStr); // 更新結束時間的最小值
+            }
+        });
+    
+        var endPicker = flatpickr("#endTime", {
+            locale: "zh-tw",
+            plugins: [new monthSelectPlugin({
+                shorthand: true,
+                dateFormat: "Y-m",
+                altFormat: "F Y",
+            })],
+            minDate: "2020-01", // 設定最小日期
+            maxDate: "2021-12", // 設定最大日期
+            onValueUpdate: function(selectedDates, dateStr, instance) {
+                startPicker.set('maxDate', dateStr); // 更新開始時間的最大值
+            }
+        });
+    });
+    function toggleDropdown(show) {
+        const dropdown = document.getElementById("deeperInsightDropdown");
+        if (show) {
+            dropdown.classList.remove("hidden");
+        } else {
+            setTimeout(() => dropdown.classList.add("hidden"), 300); // 延遲時間以允許選項點擊
+        }
+    }
+
+    // 選擇選項並更新輸入框
+    function selectOption(option) {
+        document.getElementById("deeperInsightSearch").value = option;
+        document.getElementById("hiddenDeeperInsightSearch").value = option;
+        toggleDropdown(false);
+    }
+
+    // 篩選選項
+    function filterOptions() {
+        const searchValue = document.getElementById("deeperInsightSearch").value.toLowerCase();
+        const options = document.getElementById("deeperInsightOptions").getElementsByTagName("li");
+
+        let anyVisible = false; // 用來追蹤是否有顯示的選項
+
+        for (let i = 0; i < options.length; i++) {
+            const optionText = options[i].textContent.toLowerCase();
+            if (optionText.includes(searchValue)) {
+                options[i].style.display = "block";
+                anyVisible = true;
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+
+        // 若有任何符合搜尋條件的選項，則顯示下拉選單
+        if (searchValue === "" || anyVisible) {
+            toggleDropdown(true);
+        } else {
+            toggleDropdown(false);
+        }
+    }
+
+    // 點擊輸入框顯示下拉選單
+    document.getElementById("deeperInsightSearch").addEventListener("focus", function() {
+        toggleDropdown(true);
+    });
+
+    // 點擊範圍外隱藏下拉選單
+    document.addEventListener("click", function(event) {
+        const searchInput = document.getElementById("deeperInsightSearch");
+        const dropdown = document.getElementById("deeperInsightDropdown");
+
+        if (!dropdown.contains(event.target) && event.target !== searchInput) {
+            toggleDropdown(false);
+        }
+    });
+    document.getElementById('viewTitleListButton').addEventListener('click', function() {
+        const titleListContainer = document.getElementById('titleListContainer');
+        titleListContainer.classList.toggle('hidden');
+    });
+</script>
+
+<style>
+</style>
+{% endblock %}

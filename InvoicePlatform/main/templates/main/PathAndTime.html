@@ -1,0 +1,203 @@
+{% extends "Mainpage.html" %}
+{% load static %}
+
+{% block main %}
+<div class="bg-green-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-12 rounded-lg shadow-lg w-full max-w-3xl mx-auto mt-10">
+        <!-- Progress Bar -->
+        {% if pictureType == 3 %}
+        <div class="mb-8">
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                <div class="bg-green-500 h-3 rounded-full" style="width: 50%;"></div>
+            </div>
+            <div class="flex justify-around text-base text-gray-500">
+                <span class="text-center w-1/2">Step 1: 選擇地區</span>
+                <span class="text-center w-1/2">Step 2: 選擇日時間和通路</span>
+                
+            </div>
+        </div>
+        {% else %}
+        <div class="mb-8">
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                <div class="bg-green-500 h-3 rounded-full" style="width: 66%;"></div>
+            </div>
+            <div class="flex justify-around text-base text-gray-500">
+                <span class="text-center w-1/3">Step 1: 選擇地區</span>
+                <span class="text-center w-1/3">Step 2: 選擇時間和通路</span>
+                <span class="text-center w-1/3">Step 3: 選擇產品分類</span>
+            </div>
+        </div>
+        {% endif %}
+
+
+        <!-- Title -->
+        <h2 class="text-4xl font-bold text-gray-800 mb-10 text-center">請選擇時間和通路</h2>
+
+        {% if pictureType == 1 %}
+        <form id="pathAndTimeForm" method="POST" action="{% url 'main:drawBuyWith' %}?step=select_path_time" autocomplete="off">
+        {% elif pictureType == 3 %}
+        <form id="pathAndTimeForm" method="POST" action="{% url 'main:drawRFM' %}?step=select_path_time" autocomplete="off">
+        {% elif pictureType == 4 %}
+        <form id="pathAndTimeForm" method="POST" action="{% url 'main:drawRFMwithProduct' %}?step=select_path_time" autocomplete="off">
+        {% endif %}
+            {% csrf_token %}
+
+            <!-- Date Selection -->
+            <div class="flex justify-between mb-8">
+                <div class="w-1/2 pr-4">
+                    <label for="start_time" class="block text-lg font-medium text-gray-700">開始時間</label>
+                    <input type="text" id="start_time" name="start_time" class="datetimepicker mt-2 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-lg" placeholder="選擇開始時間" value="{{ startTime }}">
+                </div>
+                <div class="w-1/2 pl-4">
+                    <label for="end_time" class="block text-lg font-medium text-gray-700">結束時間</label>
+                    <input type="text" id="end_time" name="end_time" class="datetimepicker mt-2 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-lg" placeholder="選擇結束時間" value="{{ endTime }}">
+                </div>
+            </div>
+
+            <!-- Store Selection -->
+            <div class="mb-8 relative">
+                <label for="store" class="block text-lg font-medium text-gray-700">請選擇通路</label>
+                <input type="text" id="pathFilter" class="mt-2 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-lg" placeholder="搜尋通路..." value="{{ stores }}">
+                <select id="store" name="store" class="mt-2 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-lg" size="5" style="overflow-y: auto; display: none;">
+                    <option value="" {% if stores == "" %}selected{% endif %}>所有通路</option>
+                    <option value="超市、便利商店" {% if stores == "超市、便利商店" %}selected{% endif %}>超市、便利商店</option>
+                    <option value="購物中心" {% if stores == "購物中心" %}selected{% endif %}>購物中心</option>
+                    <option value="餐廳" {% if stores == "餐廳" %}selected{% endif %}>餐廳</option>
+                    <option value="大眾運輸" {% if stores == "大眾運輸" %}selected{% endif %}>大眾運輸</option>
+                    <option value="線上商店" {% if stores == "線上商店" %}selected{% endif %}>線上商店</option>
+                    <option value="通訊" {% if stores == "通訊" %}selected{% endif %}>通訊</option>
+                    <option value="家居用品" {% if stores == "家居用品" %}selected{% endif %}>家居用品</option>
+                    <option value="美妝保養" {% if stores == "美妝保養" %}selected{% endif %}>美妝保養</option>
+                    <option value="其他" {% if stores == "其他" %}selected{% endif %}>其他</option>
+                </select>
+                
+            </div>
+
+            <!-- Error Message -->
+            {% if errorMessage %}
+            <div id="errorMessage" class="text-red-500 text-sm mb-4">{{ errorMessage }}</div>
+            {% else %}
+            <div id="errorMessage" class="text-red-500 text-sm mb-4" style="display: none;">開始時間必須早於結束時間</div>
+            {% endif %}
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-10">
+                <a 
+                    {% if pictureType == 1 %}
+                        href="{% url 'main:drawBuyWith' %}?step=select_area"
+                    {% elif pictureType == 3 %}
+                        href="{% url 'main:drawRFM' %}?step=select_area"
+                    {% elif pictureType == 4 %}
+                        href="{% url 'main:drawRFMwithProduct' %}?step=select_area"
+                    {% endif %}
+                    class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 flex items-center text-lg font-medium">
+                <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon>Back
+                </a>
+                <button type="submit" id="nextButton" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center text-lg font-medium">
+                    <ion-icon name="arrow-forward-outline" class="mr-2"></ion-icon>Next
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize flatpickr for start and end time with monthSelect plugin
+            var startPicker = flatpickr("#start_time", {
+                locale: "zh-tw",
+                plugins: [new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "F Y",
+                })],
+                minDate: "2020-01",
+                maxDate: "2021-12",
+                onValueUpdate: function(selectedDates, dateStr, instance) {
+                    endPicker.set('minDate', dateStr);
+                }
+            });
+
+            var endPicker = flatpickr("#end_time", {
+                locale: "zh-tw",
+                plugins: [new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "F Y",
+                })],
+                minDate: "2020-01",
+                maxDate: "2021-12",
+                onValueUpdate: function(selectedDates, dateStr, instance) {
+                    startPicker.set('maxDate', dateStr);
+                }
+            });
+
+            // Filter store options based on input and show dropdown automatically
+            $('#pathFilter').on('input', function() {
+                var filterValue = $(this).val().toLowerCase();
+                $('#store').show();  // 顯示下拉選單
+                $('#store option').each(function() {
+                    $(this).toggle($(this).text().toLowerCase().includes(filterValue));
+                });
+            });
+
+            $('#pathFilter').on('focus', function() {
+                $('#store').show();  // 當點擊時顯示下拉選單
+            });
+
+            // $('#pathFilter').on('blur', function() {
+            //     setTimeout(function() {
+            //         $('#store').hide();  // 當失去焦點時隱藏下拉選單
+            //     }, 200);
+            // });
+
+            // Update input field when option is selected
+            $('#store').on('change', function() {
+                var selectedText = $(this).find("option:selected").text();
+                $('#pathFilter').val(selectedText);
+                $('#store').hide();
+            });
+
+            // Form validation on submit
+            $('#pathAndTimeForm').submit(function(event) {
+                var startTime = $('#start_time').val();
+                var endTime = $('#end_time').val();
+                if (new Date(startTime) >= new Date(endTime)) {
+                    $('#errorMessage').text('開始時間必須早於結束時間').show();
+                    event.preventDefault();
+                } else {
+                    $('#errorMessage').hide();
+                }
+            });
+        });
+    </script>
+</div>
+
+<style>
+    
+    /* 控制下拉選單樣式，使其總是向下展開 */
+    .mb-8 .relative select {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+    }
+ 
+    #store {
+        font-size: 1.25rem; /* 調整字體大小 */
+        padding: 12px; /* 增加內部間距 */
+        border: 1px solid #D1D5DB;
+        border-radius: 0.375rem;
+        background-color: #fff;
+        color: #374151;
+        width: 100%; /* 保持寬度一致 */
+        max-height: 200px; /* 設定最大高度，讓選項不超過一定範圍 */
+        overflow-y: auto; /* 垂直滾動 */
+    }
+
+    #store option {
+        padding: 10px; /* 增加選項的間距 */
+        font-size: 1.1rem; /* 調整選項字體大小 */
+    }
+</style>
+{% endblock %}

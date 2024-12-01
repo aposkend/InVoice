@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        body {
+            background-color: #e0f7f5;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .main-container {
+            max-width: 900px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="p-4 bg-white shadow fixed top-0 left-0 w-full z-20 flex items-center justify-between">
+    <span class="text-xl font-semibold text-gray-800">Invoice Platform</span>
+    <div class="flex space-x-4 items-center">
+      <span class="text-lg text-gray-600 cursor-pointer">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </span>
+      <span class="text-lg text-gray-600 cursor-pointer">
+        <ion-icon name="settings-outline"></ion-icon>
+      </span>
+      <span class="text-lg text-gray-600 cursor-pointer">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </span>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex items-center justify-center min-h-screen mt-16 p-6">
+    <div class="main-container bg-white p-10 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Welcome to the Invoice Platform</h1>
+      <!-- <p class="text-gray-600 text-center max-w-xl mx-auto mb-10">
+        Analyze your invoices, generate insights, and empower your business with ease.
+      </p> -->
+
+      <!-- Feature Cards Section -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Sales Channel Analysis Card -->
+        <a href="{% url 'main:drawPath' %}?clearSession=True" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-green-600">
+            <ion-icon name="create-outline" class="text-2xl"></ion-icon>
+            <h2 class="text-xl font-semibold">Sales Channel Analysis</h2>
+          </div>
+          <p class="text-gray-600 mt-2">Analyze different sales channels to gain insights into customer purchases.</p>
+        </a>
+
+        <!-- Co-Purchase Analysis Card -->
+        <a href="{% url 'main:drawBuyWith' %}?clearSession=True" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-green-600">
+            <ion-icon name="create-outline" class="text-2xl"></ion-icon>
+            <h2 class="text-xl font-semibold">Co-Purchase Analysis</h2>
+          </div>
+          <p class="text-gray-600 mt-2">Discover frequently bought-together items to improve inventory and sales strategies.</p>
+        </a>
+
+        <!-- General RFM Analysis Card -->
+        <a href="{% url 'main:drawRFM' %}?clearSession=True" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-yellow-600">
+            <ion-icon name="analytics-outline" class="text-3xl"></ion-icon>
+            <h2 class="text-xl font-semibold">General RFM Analysis</h2>
+          </div>
+          <p class="text-gray-600 mt-2">Perform RFM (Recency, Frequency, Monetary) analysis to segment your customer base.</p>
+        </a>
+
+        <!-- Tag-Specific RFM Analysis Card -->
+        <a href="{% url 'main:drawRFMwithProduct' %}?clearSession=True" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-yellow-600">
+            <ion-icon name="analytics-outline" class="text-3xl"></ion-icon>
+            <h2 class="text-xl font-semibold">Tag-Specific RFM Analysis</h2>
+          </div>
+          <p class="text-gray-600 mt-2">Dive deeper into RFM analysis based on specific product tags to tailor strategies.</p>
+        </a>
+
+        <!-- Upload Invoice Card -->
+        <a href="{% url 'main:uploadFile' %}" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-purple-600">
+            <ion-icon name="cloud-upload-outline" class="text-3xl"></ion-icon>
+            <h2 class="text-xl font-semibold">Upload Invoice</h2>
+          </div>
+          <p class="text-gray-600 mt-2">Upload new invoices to include them in analysis and reports.</p>
+        </a>
+
+        <!-- Stored Picture Card -->
+        <a href="{% url 'main:getStoredPicture' %}" class="card p-6 rounded-lg block">
+          <div class="flex items-center space-x-3 text-indigo-600">
+            <ion-icon name="images-outline" class="text-3xl"></ion-icon>
+            <h2 class="text-xl font-semibold">Stored Picture</h2>
+          </div>
+          <p class="text-gray-600 mt-2">View and manage your stored images related to invoice processing.</p>
+        </a>
+
+      </section>
+    </div>
+  </main>
+
+</body>
+</html>

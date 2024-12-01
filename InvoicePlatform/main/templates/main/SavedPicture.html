@@ -1,0 +1,133 @@
+{% extends "Mainpage.html" %}
+{% block main %}
+{% load tz %}
+
+<script>
+    function limitCheckboxes() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let checkedCount = 0;
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+
+                if (checkedCount >= 2) {
+                    checkboxes.forEach(c => {
+                        if (!c.checked) {
+                            c.disabled = true;
+                        }
+                    });
+                } else {
+                    checkboxes.forEach(c => {
+                        c.disabled = false;
+                    });
+                }
+            });
+        });
+    }
+
+    function validateForm(event) {
+        const selected = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (selected.length !== 2) {
+            event.preventDefault();
+            alert("Please select exactly two pictures.");
+        }
+    }
+
+    function deleteGraph(pictureId) {
+        if (confirm("Are you sure you want to delete this picture?")) {
+            console.log("Preparing to send delete request for picture ID:", pictureId);
+            fetch("{% url 'main:deleteGraph' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}", // Django CSRF token
+                },
+                body: JSON.stringify({ pictureId: pictureId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Delete successful:", data);
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Delete failed:", error);
+                alert("An error occurred while deleting the picture.");
+            });
+        }
+    }
+    
+    
+    
+
+    window.onload = function() {
+        limitCheckboxes();
+        const form = document.querySelector('form');
+        form.addEventListener('submit', validateForm);
+    };
+</script>
+
+<body class="bg-gray-100 p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center">Stored Pictures</h1>
+
+    <form method="post" action="{% url 'main:loadPicture' %}" class="bg-white p-8 shadow-md rounded-lg">
+        {% csrf_token %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 bg-gray-200 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Select</th>
+                        <th class="py-2 px-4 bg-gray-200 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Picture Name</th>
+                        <th class="py-2 px-4 bg-gray-200 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Created Time</th>
+                        <th class="py-2 px-4 bg-gray-200 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% if pictures %}
+                        {% for picture in pictures %}
+                        <tr>
+                            <td class="py-2 px-4">
+                                <input type="checkbox" name="selectedPictures" value="{{ picture.id }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                            </td>
+                            <td class="py-2 px-4 text-sm font-medium text-gray-900">{{ picture.name }}</td>
+                            <td class="py-2 px-4 text-sm text-gray-500">{{ picture.createdTime|localtime }}</td>
+                            <td class="py-1 px-2">
+                                <button 
+                                    type="button" 
+                                    onclick="deleteGraph('{{ picture.id }}')" 
+                                    class="px-2 py-0.5 bg-red-500 text-white text-xs font-medium rounded shadow hover:bg-red-600 focus:outline-none focus:ring-1 focus:ring-red-400 focus:ring-opacity-75 transition duration-150 ease-in-out"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                            
+                            
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="py-6 px-4 text-center">
+                                <div class="text-gray-600 text-lg font-semibold">
+                                    {{ message }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 text-center">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                Compare
+            </button>
+        </div>
+    </form>
+</body>
+{% endblock main %}

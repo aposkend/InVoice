@@ -1,0 +1,96 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-6">
+        <div class="bg-white p-5 rounded shadow">
+            <h2 class="text-2xl font-semibold mb-4">請選擇分類和產品</h2>
+            {% if pictureType == 1 %}
+            <form id="tagForm" method="POST" action="{% url 'main:drawBuyWith' %}?step=select_tag">
+            {% elif pictureType == 2 %}
+            <form id="tagForm" method="POST" action="{% url 'main:drawPath' %}?step=select_tag">
+            {% elif pictureType == 4 %}
+            <form id="tagForm" method="POST" action="{% url 'main:drawRFMwithProduct' %}?step=select_tag">
+            {% endif %}
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="bigTag" class="block text-lg font-medium text-gray-700">選擇分類</label>
+                    <input type="text" id="tagFilter" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm" placeholder="搜尋標籤...">
+                    <select id="bigTag" name="bigTag" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        <option value="">請選擇分類</option>
+                        {% for tag in bigTags %}
+                            <option value="{{ tag }}">{{ tag }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="smallTag" class="block text-lg font-medium text-gray-700">選擇子分類</label>
+                    <input type="text" id="itemFilter" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm" placeholder="搜尋項目...">
+                    <select id="smallTag" name="smallTag" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                        <option value="">請先選擇分類</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="productFilter" class="block text-lg font-medium text-gray-700">搜尋產品</label>
+                    <input type="text" id="productFilter" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm" placeholder="搜尋產品...">
+                    
+                    <!-- 這個多選框將顯示篩選後的產品 -->
+                    <select id="productSelect" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm" multiple>
+                    </select>
+                </div>
+
+                <!-- 顯示已選擇的產品 -->
+                <div class="mb-4">
+                    <label class="block text-lg font-medium text-gray-700">已選擇的產品</label>
+                    <ul id="selectedProducts" class="list-disc pl-5"></ul>
+                </div>
+
+                <div class="flex justify-between">
+                    <button type="button" onclick="window.history.back()" class="px-2 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center text-sm">
+                        <ion-icon name="arrow-back-outline" class="mr-1"></ion-icon>Back
+                    </button>
+                    <button type="submit" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center text-sm">
+                        <ion-icon name="save-outline" class="mr-1"></ion-icon>Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 假設你將整個產品列表從後端傳到前端
+            var products = {{ products|safe }};
+            var selectedProducts = [];
+
+            // 當用戶在產品搜尋框中輸入時，過濾並顯示符合條件的產品
+            $('#productFilter').on('input', function() {
+                var filterValue = $(this).val().toLowerCase();
+                var filteredProducts = products.filter(function(product) {
+                    return product.toLowerCase().indexOf(filterValue) > -1;
+                });
+
+                // 清空當前選項
+                $('#productSelect').empty();
+
+                // 添加篩選後的產品作為選項
+                filteredProducts.forEach(function(product) {
+                    $('#productSelect').append('<option value="' + product + '">' + product + '</option>');
+                });
+            });
+
+            // 當用戶選擇產品時，將其加入到已選產品列表中
+            $('#productSelect').on('change', function() {
+                var selected = $(this).val();  // 取得多選框中已選中的產品
+                selected.forEach(function(product) {
+                    if (!selectedProducts.includes(product)) {
+                        selectedProducts.push(product);
+                        $('#selectedProducts').append('<li>' + product + '</li>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends "Mainpage.html" %}
+{% load static %}
+
+{% block main %}
+
+<div class="bg-green-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-12 rounded-lg shadow-lg w-full max-w-3xl mx-auto mt-10">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                <div class="bg-green-500 h-3 rounded-full" style="width: 100%;"></div> <!-- 設定寬度為 100% -->
+            </div>
+            <div class="flex justify-around text-base text-gray-500">
+                <span class="text-center w-1/3">Step 1: 選擇地區</span>
+                <span class="text-center w-1/3">Step 2: 選擇時間和通路</span>
+                <span class="text-center w-1/3 font-semibold text-gray-700">Step 3: 選擇產品分類</span>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-4xl font-bold text-gray-800 mb-10 text-center">請選擇分類和產品</h2>
+
+        {% if pictureType == 1 %}
+        <form id="tagForm" method="POST" action="{% url 'main:drawBuyWith' %}?step=select_tag">
+        {% elif pictureType == 2 %}
+        <form id="tagForm" method="POST" action="{% url 'main:drawPath' %}?step=select_tag">
+        {% elif pictureType == 4 %}
+        <form id="tagForm" method="POST" action="{% url 'main:drawRFMwithProduct' %}?step=select_tag">
+        {% endif %}
+            {% csrf_token %}
+
+            <!-- 隱藏的 input 來存儲最終選中的 product list -->
+            <input type="hidden" id="selectedProductsInput" name="selectedProducts" value="">
+
+            <!-- Category Selection -->
+            <div class="mb-6">
+                <label for="bigTag" class="block text-lg font-medium text-gray-700">選擇分類</label>
+                <select id="bigTag" name="bigTag" class="mt-2 block w-full py-3 px-4 border border-gray-300 rounded-md shadow-sm select2">
+                    <option value="" disabled selected>請選擇分類</option> <!-- 添加提示選項 -->
+                    {% for tag in bigTags %}
+                        <option value="{{ tag }}">{{ tag }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+
+            <!-- Subcategory Selection -->
+            <div class="mb-6">
+                <label for="smallTag" class="block text-lg font-medium text-gray-700">選擇子分類</label>
+                <select id="smallTag" name="smallTag" class="mt-2 block w-full py-3 px-4 border border-gray-300 rounded-md shadow-sm select2">
+                    <option value="">請先選擇分類</option> 
+                </select>
+            </div>
+            
+
+            <!-- Product Search -->
+            <div class="mb-6">
+                <label for="productFilter" class="block text-lg font-medium text-gray-700">搜尋並選擇產品</label>
+                <input type="text" id="productFilter" class="mt-2 block w-full py-3 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none" placeholder="搜尋產品...">
+                
+                
+
+                <ul id="productResults" class="bg-white border border-gray-300 mt-2 max-h-48 overflow-auto"></ul>
+                <div id="smallTagWarning" class="text-red-500 text-sm mt-2" style="display: none;">請先選擇小分類</div> <!-- 新增提示訊息 -->
+            </div>
+            
+            
+            <!-- 已選產品 -->
+            <div class="mb-6">
+                <label class="block text-lg font-medium text-gray-700">已選擇的產品</label>
+                <ul id="selectedProducts" class="list-disc pl-5"></ul>
+            </div>
+            
+
+            {% if errorMessage %}
+            <div class="text-red-500 text-sm mb-4">{{ errorMessage }}</div>
+            {% endif %}
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="text-red-500 text-sm mb-4" style="display: none;">總資料數量必須大於或等於 100 才能提交</div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-10">
+                
+                <a 
+                    {% if pictureType == 1 %}
+                        href="{% url 'main:drawBuyWith' %}?step=select_path_time"
+                    {% elif pictureType == 2 %}
+                        href="{% url 'main:drawPath' %}?step=select_time"
+                    {% elif pictureType == 3 %}
+                        href="{% url 'main:drawRFM' %}?step=select_path_time"
+                    {% elif pictureType == 4 %}
+                        href="{% url 'main:drawRFMwithProduct' %}?step=select_path_time"
+                    {% endif %}
+                    class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 flex items-center text-lg font-medium">
+                <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon>Back
+                </a>
+
+                <button type="submit" id="submitBtn" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center text-lg font-medium">
+                    <ion-icon name="save-outline" class="mr-2"></ion-icon>Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+    <script>
+$(document).ready(function() {
+    // 初始化 Select2 並設置下拉選單固定向下和啟用搜尋功能
+    $('.select2').select2({
+        dropdownParent: $('body'),
+        width: '100%',
+        placeholder: "請選擇或搜尋",
+        allowClear: true
+    });
+    $('#smallTag').select2({
+        placeholder: "請先選擇分類",
+        language: {
+            noResults: function() {
+                return "請先選擇分類";  // 自訂提示訊息
+            }
+        },
+        escapeMarkup: function(markup) {
+            return markup;
+        }
+    });
+    var selectedProducts = [];
+    var totalProductCount = 0;
+    
+    
+    // 顯示累計數量的元素
+    $('#selectedProducts').after('<div id="totalProductCount" class="mt-4 text-lg font-semibold">總資料數量: 0</div>');
+
+    // 當大類選擇發生變更時，自動獲取對應的小類
+    $('#bigTag').change(function() {
+        var bigtag = $(this).val();
+        if (bigtag) {
+            $.ajax({
+                url: '{% url "main:getSmallTags" %}',
+                data: { 'bigtag': bigtag },
+                success: function(data) {
+                    var smallTagSelect = $('#smallTag');
+                    smallTagSelect.empty();  // 清空當前選項
+                    smallTagSelect.append('<option value="">請選擇子分類</option>');
+                    $.each(data.smallTags, function(index, value) {
+                        smallTagSelect.append('<option value="' + value.name + '">' + value.name + '</option>');
+                    });
+                    $('#smallTag').val(null).trigger('change');  // 重設選項
+                }
+            });
+        } else {
+            $('#smallTag').empty().append('<option value="">請先選擇分類</option>');  // 若未選擇大分類，恢復提示選項
+        }
+        $('#bigTagWarning').hide();
+        
+    });
+
+    // 當點擊「搜尋產品」的輸入框時，檢查是否選擇了大分類
+    $('#productFilter').on('focus', function() {
+        var smallTag = $('#smallTag').val(); 
+        if (!smallTag) {
+            $('#smallTagWarning').show(); // 顯示提示訊息
+            return; // 停止執行後續步驟
+        }
+        $('#smallTagWarning').hide(); // 隱藏提示訊息（如果已選擇小分類）
+    
+
+        
+
+        if (!smallTag) {
+            $('#productResults').empty();
+            return;
+        }
+
+        $.ajax({
+            url: '{% url "main:getProducts" %}',  
+            data: { 'smallTag': smallTag },
+            success: function(data) {
+                var filteredProducts = data.products; // 顯示全部產品，不依賴輸入進行篩選
+
+                // 顯示篩選結果，使用 checkbox
+                $('#productResults').empty();
+                
+
+                filteredProducts.forEach(function(product) {
+                    $('#productResults').append(`
+                        <li class="p-2">
+                            <input type="checkbox" class="productCheckbox" data-product="${product.name}" data-count="${product.count}">
+                            ${product.name} (${product.count} 筆)
+                        </li>
+                    `);
+                });
+
+                
+            
+                // 當用戶選擇產品時，將其加入到已選列表中
+                $('.productCheckbox').on('change', function() {
+                    var product = $(this).data('product');
+                    var count = $(this).data('count');
+                    if (this.checked) {
+                        if (!selectedProducts.includes(product)) {
+                            selectedProducts.push(product);
+                            $('#selectedProducts').append('<li>' + product + ' (' + count + ' 筆)<button class="remove-btn" data-product="' + product + '" data-count="' + count + '">移除</button></li>');
+                            totalProductCount += count;
+                        }
+                    } else {
+                        // 如果取消選擇，從已選列表中移除
+                        selectedProducts = selectedProducts.filter(function(p) { return p !== product });
+                        $('#selectedProducts li:contains("' + product + '")').remove();
+                        totalProductCount -= count;
+                    }
+
+                    // 更新總資料數量顯示
+                    $('#totalProductCount').text('總資料數量: ' + totalProductCount);
+
+                    // 更新隱藏的 input，將選中的產品列表以逗號分隔的形式存入
+                    $('#selectedProductsInput').val(selectedProducts.join(','));
+                });
+            }
+        });
+    });
+
+    // 使點擊列表項時可以切換 checkbox 的選擇狀態
+    $('#productResults').on('click', 'li', function(event) {
+        if (event.target.tagName !== 'INPUT') { // 避免點擊 checkbox 本身時重複觸發
+            $(this).find('.productCheckbox').trigger('click');
+        }
+    });
+
+    // 點擊移除按鈕時移除選中的產品
+    $('#selectedProducts').on('click', '.remove-btn', function() {
+        var product = $(this).data('product');
+        var count = $(this).data('count');
+        selectedProducts = selectedProducts.filter(function(p) { return p !== product });
+        $(this).parent().remove();
+        totalProductCount -= count;
+
+        // 更新總資料數量顯示
+        $('#totalProductCount').text('總資料數量: ' + totalProductCount);
+
+        // 更新隱藏的 input，將選中的產品列表以逗號分隔的形式存入
+        $('#selectedProductsInput').val(selectedProducts.join(','));
+
+        // 取消產品選擇狀態
+        $('.productCheckbox[data-product="' + product + '"]').prop('checked', false);
+    });
+
+    // 表單提交時檢查條件
+    $('#tagForm').submit(function(event) {
+        event.preventDefault(); // 一開始就阻止表單提交
+
+        var smallTag = $('#smallTag').val(); // 獲取小分類的值
+
+        // 檢查小分類是否已選擇
+        if (!smallTag) {
+            $('#errorMessage').text('請選擇子分類').show(); // 顯示錯誤訊息
+            return; // 停止後續檢查
+        }
+
+        // 檢查總資料數量是否達到100的最低門檻
+        if (selectedProducts.length > 0 && totalProductCount < 100) {
+            $('#errorMessage').text('總資料數量必須大於或等於 100 才能提交').show(); // 顯示錯誤訊息
+            return; // 停止後續檢查
+        } 
+
+        $('#errorMessage').hide(); // 隱藏錯誤訊息
+        this.submit(); // 在所有條件通過後提交表單
+    });
+
+    // 大類選擇後，自動載入小類
+    var selectedBigTag = "{{ bigTag }}";
+    if (selectedBigTag) {
+        $('#bigTag').val(selectedBigTag).change();
+    }
+    $('#smallTag').on('change', function() {
+        if ($(this).val()) {
+            $('#submitBtn').prop('disabled', false)
+                .removeClass('bg-gray-300 text-gray-500 cursor-not-allowed')
+                .addClass('bg-green-500 text-white hover:bg-green-600');
+        } else {
+            $('#submitBtn').prop('disabled', true)
+                .removeClass('bg-green-500 text-white hover:bg-green-600')
+                .addClass('bg-gray-300 text-gray-500 cursor-not-allowed');
+        }
+        
+        $('#smallTagWarning').hide(); // 當選擇小分類時自動隱藏提示訊息
+        
+    });
+});
+</script>
+
+<style>/* Customize the dropdown to look more minimalistic */
+    .select2-container .select2-selection--single {
+        height: 42px; /* Adjust height */
+        border: 1px solid #ced4da; /* Light border color */
+        border-radius: 4px; /* Rounded corners */
+        padding: 6px 12px;
+        outline: none;
+        box-shadow: none;
+    }
+    
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        color: #495057;
+        font-size: 1rem;
+        padding-left: 8px;
+    }
+    
+    /* Customize dropdown appearance */
+    .select2-dropdown {
+        border: 1px solid #ced4da; /* Light border color */
+        border-radius: 4px; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+    
+    /* Customize the search box inside dropdown */
+    .select2-container .select2-search--dropdown .select2-search__field {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    /* Customize list items in the dropdown */
+    .select2-results__option {
+        padding: 10px 12px;
+        font-size: 1rem;
+        color: #495057;
+    }
+    
+    /* Highlighted (hovered) item */
+    .select2-results__option--highlighted {
+        background-color: #f0f0f0; /* Light background on hover */
+        color: #333;
+    }
+    /* 搜尋產品的搜索框調整 */
+#productFilter {
+    height: 36px; /* 調整搜索框高度 */
+    padding: 4px 8px; /* 調整內邊距 */
+    font-size: 1rem; /* 字體大小 */
+    border: 1px solid #ced4da; /* 輕微邊框 */
+    border-radius: 4px; /* 圓角 */
+    box-shadow: none; /* 移除陰影 */
+}
+
+/* 調整搜尋結果選項的樣式 */
+#productResults li {
+    padding: 8px 12px; /* 減小選項內邊距 */
+    font-size: 1rem; /* 字體大小一致 */
+    color: #495057; /* 調整文字顏色 */
+    border-bottom: 1px solid #e9ecef; /* 增加底部分隔線 */
+}
+
+/* 選項 hover 效果 */
+#productResults li:hover {
+    background-color: #f8f9fa; /* 輕微背景色變化 */
+    cursor: pointer;
+}
+
+/* Checkbox 調整 */
+.productCheckbox {
+    margin-right: 8px; /* 調整勾選框與文字的間距 */
+}
+/* 已選擇的產品樣式 */
+#selectedProducts {
+    list-style-type: none; /* 移除項目符號 */
+    padding: 0;
+    margin: 0;
+}
+
+#selectedProducts li {
+    background-color: #f8f9fa; /* 淺灰色背景 */
+    border: 1px solid #ced4da; /* 淺邊框 */
+    border-radius: 4px; /* 圓角 */
+    padding: 8px 12px; /* 增加內邊距 */
+    margin-bottom: 6px; /* 每個項目之間的間距 */
+    display: flex; /* 使用 flex 布局 */
+    align-items: center; /* 垂直居中對齊 */
+    justify-content: space-between; /* 兩端對齊 */
+    font-size: 1rem; /* 字體大小 */
+    color: #495057; /* 文字顏色 */
+}
+
+/* 刪除按鈕樣式 */
+#selectedProducts li .remove-btn {
+    background-color: #dc3545; /* 紅色背景 */
+    color: white; /* 文字顏色為白色 */
+    border: none; /* 移除邊框 */
+    border-radius: 4px; /* 圓角 */
+    padding: 2px 8px; /* 內邊距 */
+    cursor: pointer; /* 指標樣式 */
+    font-size: 0.875rem; /* 字體大小略小 */
+    transition: background-color 0.3s; /* 增加過渡效果 */
+}
+
+#selectedProducts li .remove-btn:hover {
+    background-color: #c82333; /* 當鼠標懸停時的背景色 */
+}
+
+
+    </style>
+{% endblock %}

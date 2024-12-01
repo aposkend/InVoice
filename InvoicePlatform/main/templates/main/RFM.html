@@ -1,0 +1,70 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<body class="bg-gray-50 h-screen">
+    <div class="container mx-auto py-4 h-full flex flex-col">
+        <div class="flex items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800 mr-2">RFM Analysis in {{ rfmType }}</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-grow overflow-hidden">
+            <div class="lg:col-span-2 p-4 rounded-lg shadow-lg border border-gray-200 bg-white relative h-full flex flex-col">
+                <div class="flex justify-center mt-4 flex-grow overflow-auto">
+                    {{ picture|safe }}
+                </div>
+                <div class="absolute bottom-4 right-4 flex space-x-2">
+                    <a href="{% url 'main:saveData' %}" class="px-3 py-1 bg-green-500 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-600 transition duration-200 flex items-center">
+                        <ion-icon name="save-outline" class="mr-1"></ion-icon>Save
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-4 h-full overflow-auto">
+                <form method="POST" class="bg-white p-4 rounded-lg shadow-lg flex flex-col space-y-4">
+                    {% csrf_token %}
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Revise</h3>
+
+                    <div>
+                        <label for="district" class="block text-lg font-medium text-gray-700">顧客類別</label>
+                        <select id="district" name="district" class="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">請選擇分析類別</option>
+                            {% for rfm in rfms %}
+                                <option value="{{ rfm }}" {% if rfm == 'potential royalist' or rfm == rfmType %}selected{% endif %}>{{ rfm }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="excludeDiscounts" name="excludeDiscounts" type="checkbox" class="h-6 w-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="excludeDiscounts" class="ml-3 block text-lg font-medium text-gray-700">去除包含優惠的資料</label>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <a href="{% url 'main:drawRFM' %}?select_area" class="px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 flex items-center text-sm">
+                            Draw Another Picture
+                        </a>
+                        <button type="submit" class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center text-sm">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 監聽選擇框更改事件
+        document.getElementById("district").addEventListener("change", function() {
+            const selectedValue = this.value;
+
+            // 取得所有選項元素
+            const options = Array.from(this.options);
+
+            // 遍歷選項，隱藏已選中的選項
+            options.forEach(option => {
+                option.hidden = option.value === selectedValue;
+            });
+        });
+    </script>
+
+</body>
+{% endblock %}

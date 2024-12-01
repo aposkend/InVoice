@@ -1,0 +1,20 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<div class="container mx-auto py-4">
+    <h1 class="text-2xl font-bold text-gray-800">Analysis Result</h1>
+
+    {% if analysis %}
+        <!-- 如果有分析結果，顯示結果 -->
+        <div class="mt-4 p-4 bg-green-100 border border-green-400 rounded-lg">
+            <h2 class="text-lg font-semibold text-green-700">Analysis Output:</h2>
+            <p class="text-green-600">{{ analysis }}</p>
+        </div>
+    {% else %}
+        <!-- 如果沒有結果，顯示錯誤訊息 -->
+        <div class="mt-4 p-4 bg-red-100 border border-red-400 rounded-lg">
+            <p class="text-red-600">{{ error|default:"No analysis result available." }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

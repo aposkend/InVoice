@@ -1,0 +1,166 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<body class="bg-gray-50 min-h-screen w-full">
+    <div class="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 overflow-hidden">
+        <!-- 左邊區塊 -->
+        <div class="flex flex-col space-y-4">
+            <!-- 第一個訊息區域 -->
+            <div class="bg-white shadow-md p-4 rounded-lg flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    {{network1.network_name}} {{network1.createTime}} 
+                </h2>
+                <button id="infoButton1" class="ml-2 p-2 rounded-full text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 shadow transition duration-300">
+                    <ion-icon name="help-circle-outline" size="large"></ion-icon>
+                </button>
+            </div>
+
+            <!-- 第一個網路圖 -->
+            <div class="flex-grow p-4 rounded-lg shadow-lg border border-gray-200 bg-white max-h-full">
+                <iframe id="network1" class="w-full h-full border-none rounded-md" srcdoc="{{ network1HTML }}"></iframe>
+            </div>
+        </div>
+
+        <!-- 右邊區塊 -->
+        <div class="flex flex-col space-y-4">
+            <!-- 第二個訊息區域 -->
+            <div class="bg-white shadow-md p-4 rounded-lg flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    {{network2.network_name}}  {{network2.createTime}} 
+                </h2>
+                <button id="infoButton2" class="ml-2 p-2 rounded-full text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 shadow transition duration-300">
+                    <ion-icon name="help-circle-outline" size="large"></ion-icon>
+                </button>
+            </div>
+
+            <!-- 第二個網路圖 -->
+            <div class="flex-grow p-4 rounded-lg shadow-lg border border-gray-200 bg-white max-h-full">
+                <iframe id="network2" class="w-full h-full border-none rounded-md" srcdoc="{{ network2HTML }}"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- DataFrame 表格展示 -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 p-4">
+        <!-- d1: 圖1中的共同節點 -->
+        <div class="bg-white shadow-md p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 flex justify-between items-center">
+                圖1中的共同節點（按數量排序）
+                <button onclick="toggleTable('d1Table')" class="ml-2 p-2 text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 rounded-full shadow">
+                    <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+                </button>
+            </h3>
+            <div id="d1Table" class="overflow-x-auto hidden">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="w-full bg-gray-100">
+                            <th class="text-left py-2 px-4">節點</th>
+                            <th class="text-left py-2 px-4">數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in d1.values %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ row.0 }}</td>
+                            <td class="border px-4 py-2">{{ row.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- d2: 圖2中的共同節點 -->
+        <div class="bg-white shadow-md p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 flex justify-between items-center">
+                圖2中的共同節點（按數量排序）
+                <button onclick="toggleTable('d2Table')" class="ml-2 p-2 text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 rounded-full shadow">
+                    <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+                </button>
+            </h3>
+            <div id="d2Table" class="overflow-x-auto hidden">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="w-full bg-gray-100">
+                            <th class="text-left py-2 px-4">節點</th>
+                            <th class="text-left py-2 px-4">數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in d2.values %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ row.0 }}</td>
+                            <td class="border px-4 py-2">{{ row.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- d3: 圖1中的唯一節點 -->
+        <div class="bg-white shadow-md p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 flex justify-between items-center">
+                圖1中的唯一節點（按數量排序）
+                <button onclick="toggleTable('d3Table')" class="ml-2 p-2 text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 rounded-full shadow">
+                    <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+                </button>
+            </h3>
+            <div id="d3Table" class="overflow-x-auto hidden">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="w-full bg-gray-100">
+                            <th class="text-left py-2 px-4">節點</th>
+                            <th class="text-left py-2 px-4">數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in d3.values %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ row.0 }}</td>
+                            <td class="border px-4 py-2">{{ row.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- d4: 圖2中的唯一節點 -->
+        <div class="bg-white shadow-md p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 flex justify-between items-center">
+                圖2中的唯一節點（按數量排序）
+                <button onclick="toggleTable('d4Table')" class="ml-2 p-2 text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 rounded-full shadow">
+                    <ion-icon name="chevron-down-outline" size="large"></ion-icon>
+                </button>
+            </h3>
+            <div id="d4Table" class="overflow-x-auto hidden">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="w-full bg-gray-100">
+                            <th class="text-left py-2 px-4">節點</th>
+                            <th class="text-left py-2 px-4">數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in d4.values %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ row.0 }}</td>
+                            <td class="border px-4 py-2">{{ row.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to toggle visibility of the tables -->
+    <script>
+        function toggleTable(tableId) {
+            const table = document.getElementById(tableId);
+            table.classList.toggle('hidden');
+        }
+    </script>
+</body>
+{% endblock %}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.6.0/fabric.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/monthSelect.min.css' %}">
+    <script src="{% static 'js/flatpickr.min.js' %}"></script>
+    <script src="{% static 'js/monthSelect.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet" />
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    
+    {% block head %}{% endblock %}
+    <style>
+      body {
+        background-color: #f0faf0; /* 更淺的綠色背景 */
+      }
+      .navbar-hidden {
+        top: -60px;
+        transition: top 0.3s;
+      }
+      /* 確保 Sidebar 與內容切換順暢 */
+      #sidebar {
+        margin-top: 56px; /* 保持與 Navbar 一致 */
+        z-index: 20; /* 調低 Sidebar 的 z-index 使其不遮住 Navbar */
+      }
+      /* Sidebar 的初始位置在左側隱藏 */
+      .sidebar-hidden {
+        transform: translateX(-100%);
+      }
+    </style>
+</head>
+
+<body class="bg-green-50 flex items-center min-h-screen">
+  <!-- Navbar -->
+  <nav id="navbar" class="p-3 bg-white shadow fixed top-0 left-0 w-full z-30 transition-transform duration-300">
+    <div class="flex justify-between items-center w-full">
+      <span class="text-xl font-extrabold font-[Poppins] cursor-pointer text-green-700">Invoice Platform</span>
+      <span class="text-2xl cursor-pointer mx-2 block" onclick="toggleSidebar()">
+        <ion-icon name="menu-outline"></ion-icon>
+      </span>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="w-64 h-screen bg-green-700 text-white fixed top-0 left-0 transition-transform duration-300 sidebar-hidden z-20">
+    <ul class="py-4">
+      <li class="px-6 py-2">
+        <a href="{% url 'main:getMainpage' %}" class="flex items-center space-x-4 hover:bg-green-600">
+          <ion-icon name="home-outline" class="text-2xl"></ion-icon>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="relative px-6 py-2">
+        <button onclick="toggleDrawMenu()" class="w-full flex items-center space-x-4 hover:bg-green-600">
+          <ion-icon name="create-outline" class="text-2xl"></ion-icon>
+          <span>Network Analysis</span>
+        </button>
+        <ul id="drawMenu" class="hidden mt-1 bg-green-600 text-white rounded shadow-lg">
+          <li class="px-4 py-2 hover:bg-green-500">
+            <a href="{% url 'main:drawPath' %}?clearSession=True">Sales Channel Analysis</a>
+          </li>
+          <li class="px-4 py-2 hover:bg-green-500">
+            <a href="{% url 'main:drawBuyWith' %}?clearSession=True">Co-Purchase Analysis</a>
+          </li>
+        </ul>
+      </li>
+      <li class="px-6 py-2">
+        <button onclick="toggleRFMMenu()" class="w-full flex items-center space-x-4 hover:bg-green-600">
+          <ion-icon name="analytics-outline" class="text-2xl"></ion-icon>
+          <span>RFM Analysis</span>
+        </button>
+        <ul id="rfmMenu" class="hidden mt-1 bg-green-600 text-white rounded shadow-lg">
+          <li class="px-4 py-2 hover:bg-green-500">
+            <a href="{% url 'main:drawRFM' %}?clearSession=True">General Analysis</a>
+          </li>
+          <li class="px-4 py-2 hover:bg-green-500">
+            <a href="{% url 'main:drawRFMwithProduct' %}?clearSession=True">Tag-Specific Analysis</a>
+          </li>
+        </ul>
+      </li>
+      <li class="px-6 py-2">
+        <a href="{% url 'main:uploadFile' %}" class="flex items-center space-x-4 hover:bg-green-600">
+          <ion-icon name="cloud-upload-outline" class="text-2xl"></ion-icon>
+          <span>Upload Invoice</span>
+        </a>
+      </li>
+      <li class="px-6 py-2">
+        <a href="{% url 'main:getStoredPicture' %}" class="flex items-center space-x-4 hover:bg-green-600">
+          <ion-icon name="images-outline" class="text-2xl"></ion-icon>
+          <span>Stored Picture</span>
+        </a>
+      </li>
+    </ul>
+    <div class="px-6 py-4 mb-0">
+      <a href="{% url 'users:logout' %}" class="flex items-center space-x-4 hover:bg-green-600">
+        <ion-icon name="log-out-outline" class="text-2xl"></ion-icon>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </div>
+
+  
+  <div class="flex-1 p-10 text-2xl font-bold mt-0">
+    {% block main %}
+      
+    {% endblock %}
+  </div>
+
+  <script>
+    let lastScrollTop = 0;
+    const navbar = document.getElementById('navbar');
+    const sidebar = document.getElementById('sidebar');
+
+    
+    window.addEventListener("scroll", function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrollTop > lastScrollTop) {
+        
+        navbar.classList.add("navbar-hidden");
+      } else {
+        
+        navbar.classList.remove("navbar-hidden");
+      }
+      lastScrollTop = scrollTop;
+    });
+
+    
+    function toggleSidebar() {
+      sidebar.classList.toggle("sidebar-hidden");
+    }
+
+    function toggleDrawMenu() {
+      const drawMenu = document.getElementById('drawMenu');
+      drawMenu.classList.toggle('hidden');
+    }
+
+    function toggleRFMMenu() {
+      const rfmMenu = document.getElementById('rfmMenu');
+      rfmMenu.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

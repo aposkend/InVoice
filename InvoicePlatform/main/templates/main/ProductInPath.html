@@ -1,0 +1,237 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<body class="bg-gray-50 h-screen">
+    <div class="container mx-auto py-6">
+        <!-- Chart and Sorting Options -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+           {{ title }}
+    
+            <!-- Button to Show/Hide Title List -->
+            {% if titleList %}
+           
+                <button id="viewTitleListButton" class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 focus:outline-none">
+                    Selected Products]itle List
+                </button>
+            
+            
+            <!-- Title List (Hidden by default) -->
+            <div id="titleListContainer" class="hidden mb-6">
+                {% for n in titleList %}
+                    <p>{{ forloop.counter }}. {{ n }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+                
+
+
+            </h2>
+
+            <!-- Dropdown to Select Sort Order -->
+            <div class="mb-4">
+                <label for="orderBy" class="block text-sm font-medium text-gray-600">Sort by:</label>
+                <select id="orderBy" name="orderBy" class="mt-2 block w-full py-1.5 px-3 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="TOTAL_QUANTITY" {% if request.GET.order_by == 'TOTAL_QUANTITY' %} selected {% endif %}>Total Quantity</option>
+                    <option value="TOTAL_PROFIT" {% if request.GET.order_by == 'TOTAL_PROFIT' %} selected {% endif %}>Total Profit</option>
+                    <option value="PROFIT_PER_UNIT" {% if request.GET.order_by == 'PROFIT_PER_UNIT' %} selected {% endif %}>Profit Per Unit</option>
+                    <option value="NUMBER_OF_SALESRECORD" {% if request.GET.order_by == 'NUMBER_OF_SALESRECORD' %} selected {% endif %}>Number of Sales Records</option>
+                    <option value="PROFIT_PER_SALES" {% if request.GET.order_by == 'PROFIT_PER_SALES' %} selected {% endif %}>Profit Per Sales</option>
+                </select>
+            </div>
+
+            <!-- Chart Display -->
+            <canvas id="barChart" class="w-full h-52"></canvas>
+        </div>
+
+        <!-- Button to Show/Hide Table -->
+        <div class="text-right mb-4">
+            <button id="viewTableButton" class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 focus:outline-none">
+                View Full Data
+            </button>
+        </div>
+
+        <!-- Data Table -->
+        {% if data %}
+        <div id="dataTable" class="mt-4 bg-white p-4 rounded-lg shadow hidden">
+            <h5 class="text-sm font-medium text-gray-700 mb-3">Full Data Table</h5>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 text-sm">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-3 py-2 border-b text-left">Store</th>
+                            <th class="px-3 py-2 border-b text-left">Quantity</th>
+                            <th class="px-3 py-2 border-b text-left">Profit</th>
+                            <th class="px-3 py-2 border-b text-left">Profit/Unit</th>
+                            <th class="px-3 py-2 border-b text-left">Sales Records</th>
+                            <th class="px-3 py-2 border-b text-left">Profit/Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        {% for store_name, total_quantity, total_profit, profit_per_unit, number_of_salesrecord, profit_per_sales in data %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-3 py-2 border-b">{{ store_name }}</td>
+                            <td class="px-3 py-2 border-b">{{ total_quantity }}</td>
+                            <td class="px-3 py-2 border-b">{{ total_profit }}</td>
+                            <td class="px-3 py-2 border-b">{{ profit_per_unit|floatformat:2 }}</td>
+                            <td class="px-3 py-2 border-b">{{ number_of_salesrecord }}</td>
+                            <td class="px-3 py-2 border-b">{{ profit_per_sales|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% else %}
+        <p class="mt-4 text-center text-gray-500 text-sm">No data available</p>
+        {% endif %}
+    </div>
+
+    <!-- Chart.js Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom JavaScript for AJAX, Chart Updates, and Click Events -->
+    <script>
+        let barChart;
+
+        // Function to update the URL query parameter without reloading the page
+        function updateUrlParam(param, value) {
+            const url = new URL(window.location.href);
+            url.searchParams.set(param, value);
+            history.replaceState(null, null, url);
+        }
+
+        // Initialize the chart with dynamic label and data
+        function initializeChart(labels, quantities, labelText) {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: labelText,
+                    data: quantities,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                }]
+            };
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.3)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                        }
+                    },
+                    onClick: function(event, elements) {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const storeName = labels[index];
+                            $.ajax({
+                                url: `/buy_with_in_path/?store=${encodeURIComponent(storeName)}`,
+                                type: 'GET',
+                                success: function(response) {
+                                    if (response.status === 'error') {
+                                        alert(response.message);
+                                    } else if (response.redirect_url) {
+                                        // 設定延遲以確保前端處理無阻
+                                        setTimeout(() => {
+                                            window.location.href = response.redirect_url;
+                                        }, 100);  // 可以調整時間，避免快速跳轉
+                                    }
+                                },
+                                error: function() {
+                                    alert('An error occurred. Please try again.');
+                                }
+                            });
+                            {% comment %} window.location.href = `/buy_with_in_path/?store=${encodeURIComponent(storeName)}`; {% endcomment %}
+                        }
+                    }
+                }
+            };
+
+            barChart = new Chart(ctx, config);
+        }
+
+        // Fetch new data and update the chart and table when the dropdown changes
+        document.getElementById('orderBy').addEventListener('change', function() {
+            const orderBy = this.value;
+
+            // Define the label text based on the selected orderBy value
+            let labelText;
+            switch (orderBy) {
+                case 'TOTAL_QUANTITY': labelText = 'Total Quantity'; break;
+                case 'TOTAL_PROFIT': labelText = 'Total Profit'; break;
+                case 'PROFIT_PER_UNIT': labelText = 'Profit Per Unit'; break;
+                case 'NUMBER_OF_SALESRECORD': labelText = 'Number of Sales Records'; break;
+                case 'PROFIT_PER_SALES': labelText = 'Profit Per Sales'; break;
+            }
+
+            // Update the URL to reflect the current selection
+            updateUrlParam('order_by', orderBy);
+
+            // Make AJAX request to get the updated data
+            fetch(`/draw_product_in_path/?step=display_picture&order_by=${orderBy}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the chart with the new data and label
+                barChart.data.labels = data.top_10_stores;
+                barChart.data.datasets[0].data = data.top_10_quantities;
+                barChart.data.datasets[0].label = labelText;
+                barChart.update();
+
+                // Update the table with the new data
+                const tbody = document.getElementById('dataTableBody');
+                tbody.innerHTML = '';
+                data.data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.classList.add('hover:bg-gray-50');
+                    row.forEach(value => {
+                        const td = document.createElement('td');
+                        td.classList.add('px-3', 'py-2', 'border-b');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        });
+
+        // Toggle table visibility
+        document.getElementById('viewTableButton').addEventListener('click', function() {
+            const dataTable = document.getElementById('dataTable');
+            dataTable.classList.toggle('hidden');
+        });
+
+        // Initialize chart with default data on page load
+        window.onload = function() {
+            const labels = {{ top_10_stores|safe }};
+            const quantities = {{ top_10_quantities|safe }};
+            const labelText = 'Total Quantity';
+            initializeChart(labels, quantities, labelText);
+        };
+        document.getElementById('viewTitleListButton').addEventListener('click', function() {
+            const titleListContainer = document.getElementById('titleListContainer');
+            titleListContainer.classList.toggle('hidden');
+        });
+    </script>
+</body>
+{% endblock %} 

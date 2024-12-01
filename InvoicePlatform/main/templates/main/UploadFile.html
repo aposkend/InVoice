@@ -1,0 +1,36 @@
+{% extends "Mainpage.html" %}
+{% block main %}
+<div class="flex w-full h-screen items-center justify-center bg-grey-lighter">
+    <label class="w-70 flex flex-col items-center px-16 py-24 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue">
+        <svg class="w-20 h-20 hover:text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+        </svg>
+        <form method="post" action="{% url 'main:uploadFile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="text-red-500">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <span class="mt-2 text-base leading-normal" id="fileName">Select a file</span>
+            <span>
+                <input type='file' accept=".csv,.xlsx,.xls" class="hidden" name="{{ form.file.name }}" id="csvFile" onchange="updateFileName(this)"/>
+            </span>
+            {% if form.file.errors %}
+                <div class="text-red-500">{{ form.file.errors }}</div>
+            {% endif %}
+            <span class="block items-center">
+                <button type="submit" id="uploadButton" class="opacity-0 pointer-events-none mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+                    Upload
+                </button>
+            </span>
+        </form>
+    </label>
+</div>
+
+<script>
+function updateFileName(input) {
+    var fileName = input.files[0].name;
+    document.getElementById('fileName').textContent = fileName;
+    document.getElementById('uploadButton').classList.remove('opacity-0', 'pointer-events-none');
+}
+</script>
+{% endblock main %}

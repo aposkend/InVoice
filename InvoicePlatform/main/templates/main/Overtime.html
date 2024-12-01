@@ -1,0 +1,40 @@
+{% extends "Mainpage.html" %}
+
+{% block main %}
+<body class="bg-gray-50 h-screen">
+
+    <div class="container mx-auto py-4 h-full flex flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-grow overflow-hidden">
+
+            <div class="p-4 rounded-lg shadow-lg border border-gray-200 bg-white relative flex flex-col" style="min-height: 80vh;">
+                <div class="flex items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mr-2">Degree Centrality Over Time</h2>
+                </div>
+                <div class="flex justify-center mt-4 flex-grow overflow-auto">
+                    {{picture_degree|safe}}
+                </div>
+                <div class="absolute bottom-4 right-4 flex space-x-2">
+                    <button type="button" onclick="saveData()" class="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center text-sm">
+                        <ion-icon name="save-outline" class="mr-1"></ion-icon>Save
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="p-4 rounded-lg shadow-lg border border-gray-200 bg-white relative flex flex-col" style="min-height: 80vh;">
+                <div class="flex items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mr-2">Eigenvector Centrality Over Time</h2>
+                </div>
+                <div class="flex justify-center mt-4 flex-grow overflow-auto">
+                    {{picture_eigenvector|safe}}
+                </div>
+                <div class="absolute bottom-4 right-4 flex space-x-2">
+                    <button type="button" onclick="saveData()" class="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center text-sm">
+                        <ion-icon name="save-outline" class="mr-1"></ion-icon>Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
