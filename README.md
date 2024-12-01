@@ -150,6 +150,7 @@
    </tr>
    </table>
    <br>
+   
 ---
 
 #### 4. 產拼併買關係分析 - 以客群、產品分類來看：(Tag-Specific RFM analysis)<br>
@@ -182,7 +183,7 @@
    </td>
    <td>
       <img src="README_IMG/view5-2.png" alt="view5-2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
-      <div style="text-align: center;">Campion和At Risk客群之比較</div>
+      <div style="text-align: center;">Champion和At Risk客群之比較</div>
    </td>
    <td>
       <img src="README_IMG/view5-3.png" alt="view5-3" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
@@ -191,7 +192,8 @@
    </tr>
    </table>
    <br>
----
+   
+--- 
 
 #### 6. 上傳自有發票分析(Upload Invoice):<br>
    使用者也可以自行上傳發票到系統，其發票品名會自動經過BERT處理，將產品歸類，以利後續的分析。<br>
@@ -204,8 +206,4 @@
    </tr>
    </table>
    <br>
----
 
-### 4. 案例介紹
-
-案例一：統一超商與全家超商
