@@ -75,7 +75,7 @@
 
 ---
 
-#### 2. 產品併買關係分析 - 以產品分類來看(Co-Purchased Analysis)：<br>
+#### 2. 產品併買關係分析 - 以產品分類來看(Co-Purchase Analysis)：<br>
    使用者可以設定地區、時間、通路等條件，查看某產品分類底下的產品併買關係，同時系統會自動與ChatGPT串連，生成專業的商業分析報告以及銷售文案，供使用者在產品策略和銷售決策上的參考。<br>
     <table>
    <tr>
@@ -131,7 +131,7 @@
    
 ---
 
-#### 3. 產品併買關係分析 - 以客群分類來看：<br>
+#### 3. 產品併買關係分析 - 以客群分類來看：（General RFM analysis）<br>
 
    我們運用RFM模型，根據最近一次購買時間、購買頻率、購買金額三大指標，將消費者劃分為9大客群（Champion, Loyal Accounts, At risk, Lost ....etc），使用者可以選定特定客群來查看，該特群在產品並買上的特色<br>
    **此功能不需事先決定查看特定產品。** <br>
@@ -152,7 +152,7 @@
    <br>
 ---
 
-#### 4. 產拼併買關係分析 - 以客群、產品分類來看：<br>
+#### 4. 產拼併買關係分析 - 以客群、產品分類來看：(Tag-Specific RFM analysis)<br>
    此功能與功能3類似，僅增加選擇特定產品的功能，幫助使用者可以查看某客群在某產品分類上的併買狀況。<br>
    **此功能需事先決定查看特定產品。** <br>
 
@@ -172,12 +172,28 @@
 
 ---
 
-#### 5. 併買網路圖比較<br>
+#### 5. 併買網路圖比較(Stored Picture Comparison):<br>
    使用者可以將產品網路圖進行保存，再將兩個已包存的產品網路圖進行比較<br>
-
+<table>
+   <tr>
+   <td>
+      <img src="README_IMG/view5-1.png" alt="view5-1" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">管理先前儲存的圖片</div>
+   </td>
+   <td>
+      <img src="README_IMG/view5-2.png" alt="view5-2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Campion和At Risk客群之比較</div>
+   </td>
+   <td>
+      <img src="README_IMG/view5-3.png" alt="view5-3" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">下方選單可查看共同產品和獨特產品之細項</div>
+   </td>
+   </tr>
+   </table>
+   <br>
 ---
 
-#### 6. 上傳自有發票分析<br>
+#### 6. 上傳自有發票分析(Upload Invoice):<br>
    使用者也可以自行上傳發票到系統，其發票品名會自動經過BERT處理，將產品歸類，以利後續的分析。<br>
    <table>
    <tr>
