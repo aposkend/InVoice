@@ -90,7 +90,7 @@
    <table>
    <tr>
    <td>
-      <img src="README_IMG/regular2" alt="regular2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <img src="README_IMG/regular2.png" alt="regular2" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
       <div style="text-align: center;">一般網路圖</div>
    </td>
    <td>
