@@ -33,7 +33,19 @@
 
 #### 1. 商品銷售通路分析：<br>
    使用者可以查看某產品在各通路的銷售狀況，了解該產品在不同的銷售通路之銷售指標（通路總銷量、通路總獲利、平均每單之銷量、平均每單之獲利等），如下圖：<br>
-
+   <table>
+   <tr>
+   <td>
+      <img src="README_IMG/TP_luggage.png" alt="TP Luggage" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Total Profit of Luggage in different Channels(最佳:Momo,Costco)</div>
+   </td>
+   <td>
+      <img src="README_IMG/PSS_luggage.png" alt="PSS Luggage" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">Profit per Sales of Luggage in different Channels(最佳:三井,遠百)</div>
+   </td>
+   </tr>
+   </table>
+   <br>
    接者，使用者可以點擊畫面上的柱狀圖，進一步查看該通路底下的產品併買狀況，讓使用者可以了解「哪一個通路賣我們家的產品最好？」、「在該通路，我可以與哪些產品進行促銷或合作？」等等。<br>
 
 #### 2. 產品併買關係分析 - 以產品分類來看：<br>
