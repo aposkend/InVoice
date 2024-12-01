@@ -156,6 +156,20 @@
    此功能與功能3類似，僅增加選擇特定產品的功能，幫助使用者可以查看某客群在某產品分類上的併買狀況。<br>
    **此功能需事先決定查看特定產品。** <br>
 
+   <table>
+   <tr>
+   <td>
+      <img src="README_IMG/champion4.png" alt="champion4" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">新竹市家樂福Champion客群之啤酒併買</div>
+   </td>
+   <td>
+      <img src="README_IMG/atrisk4.png" alt="atrisk4" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <div style="text-align: center;">新竹市家樂福At Risk客群之啤酒併買</div>
+   </td>
+   </tr>
+   </table>
+   <br>
+
 ---
 
 #### 5. 併買網路圖比較<br>
