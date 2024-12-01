@@ -50,7 +50,7 @@
    <table>
    <tr>
    <td>
-      <img src="README_IMG/Costco.png" alt="Costco" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
+      <img src="README_IMG/Costco1.png" alt="Costco" width="500" style="box-shadow: 10px 10px 5px #888888;"/>
       <div style="text-align: center;">點擊Costco後可查看該通路之產品併買關係</div>
    </td>
    </tr>
