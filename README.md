@@ -11,7 +11,7 @@
 ✔️商品銷售通路分析：以銷售通路為核心，彙整商品分類在各通路的銷售表現<br>
 ✔️LLM語言模型：根據網路圖產生行銷文案與分析報告，生成創意點子的好幫手！<br>
 
-報告用簡報：https://drive.google.com/file/d/1Kzmr5Srn-AAGnDKQa3O0rdRUc0jNAeZT/view?usp=sharing <br> 
+報告用簡報：https://drive.google.com/file/d/1p551wYel9xwAlOD7tGuz7KZmG2Y4uplJ/view?usp=sharing <br> 
 報告用展示影片(2分鐘速講版)：https://drive.google.com/file/d/1lcEYuSxpBw88nrSxptocR3Fsppgo2e3h/view?usp=sharing <br>
 
 ---
